@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff7fb">
+<title>MY RPS 취향표</title>
+<style>
+:root{--pink:#f4b8d2;--hot:#df6da4;--ink:#352b34;--muted:#8d7c88;--paper:#fffafd;--line:#f0dce7;--lav:#f0eaff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff7fb,#fff 55%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+.wrap{max-width:920px;margin:auto;padding:20px 14px 44px}
+header{text-align:center;padding:20px 8px 16px} .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--hot);font-weight:800}
+h1{font-size:clamp(27px,7vw,42px);letter-spacing:-.05em;margin:8px 0 7px} .sub{font-size:13px;color:var(--muted);line-height:1.6}
+.tabs{display:flex;gap:8px;margin:12px 0 14px}.tab{flex:1;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:14px;padding:12px 8px;font-weight:800;font-size:13px}.tab.active{background:var(--ink);border-color:var(--ink);color:white}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--ink);font-size:12px;font-weight:750}.btn.primary{background:var(--hot);color:#fff;border-color:var(--hot)}.btn.danger{color:#b64a76}.btn:active{transform:scale(.98)}
+.hint{background:#fff0f7;border:1px solid #f7d9e8;border-radius:12px;padding:10px 12px;font-size:12px;color:#93637c;line-height:1.5;margin-bottom:14px}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.card{min-width:0;background:white;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #7b34500a;position:relative}
+.photo{aspect-ratio:4/4.4;background:linear-gradient(145deg,#fce6f0,#f0eaff);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}.placeholder{font-size:31px;color:#d88fb1}.photo .change{position:absolute;right:5px;bottom:5px;background:#ffffffdf;border:0;border-radius:8px;padding:6px 8px;font-size:11px}
+.card input{width:100%;border:0;border-top:1px solid #f8eaf1;padding:10px 7px;text-align:center;font-size:12px;font-weight:700;color:var(--ink);background:white;outline:none}
+.remove{position:absolute;top:5px;left:5px;border:0;background:#ffffffed;color:#9d5679;border-radius:8px;width:25px;height:25px;font-size:17px;line-height:1}
+.empty{grid-column:1/-1;text-align:center;padding:35px 15px;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#fff}
+footer{text-align:center;color:#b19ba9;font-size:11px;margin-top:22px}
+#fileInput{display:none}.modalback{position:fixed;inset:0;background:#25152177;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:5}.modalback.show{display:flex}.modal{width:min(100%,500px);background:#fff;border-radius:22px;padding:20px;box-shadow:0 15px 50px #0002}.modal h2{font-size:19px;margin:0 0 8px}.modal p{font-size:12px;color:var(--muted);line-height:1.5}.modal input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;margin:7px 0 12px}.modalactions{display:flex;gap:8px}.modalactions .btn{flex:1}
+@media(min-width:650px){.board{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.wrap{padding-top:30px}.photo{aspect-ratio:4/4.5}}
+@media(min-width:850px){.board{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media print{body{background:white}.wrap{max-width:none;padding:8px}.toolbar,.tabs,.hint,.remove,.change,footer{display:none!important}.board{grid-template-columns:repeat(4,1fr)}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">YOUR TASTE, YOUR RULES ♡</div>
+<h1>MY RPS 취향표</h1>
+<div class="sub">좋아하는 조합을 모아 나만의 취향표를 만들어 봐.</div>
+</header>
+<div class="tabs" role="tablist">
+<button class="tab active" data-tab="rps">RPS 취향표</button>
+<button class="tab" data-tab="pair">왼른 취향표</button>
+</div>
+<div class="toolbar">
+<button class="btn primary" id="add">＋ 카드 추가</button>
+<button class="btn" id="export">이미지로 저장</button>
+<button class="btn" id="share">링크·공유</button>
+<button class="btn" id="reset">초기화</button>
+</div>
+<div class="hint">♡ 카드의 사진 버튼을 눌러 사진을 넣고, 이름을 입력해 봐! 카드 순서와 이름은 이 기기 브라우저에 자동 저장돼.</div>
+<section id="board" class="board" aria-label="취향표 카드"></section>
+<footer>MADE FOR YOUR TASTE · 개인용 취향표 메이커</footer>
+</div>
+<input id="fileInput" type="file" accept="image/*">
+<div class="modalback" id="modal">
+<div class="modal">
+<h2>카드 추가하기</h2><p>이름을 적고 사진은 나중에 넣어도 돼.</p>
+<input id="newName" maxlength="50" placeholder="예: 멤버 이름 / 조합 이름">
+<div class="modalactions"><button class="btn" id="cancel">취소</button><button class="btn primary" id="confirm">카드 만들기 ♡</button></div>
+</div></div>
+<script>
+const $=s=>document.querySelector(s);
+const board=$('#board'), modal=$('#modal'), fileInput=$('#fileInput');
+let activeTab='rps', targetId=null, cards={rps:[],pair:[]};
+const key='my-rps-board-v1';
+try{const saved=JSON.parse(localStorage.getItem(key)||'{}');cards.rps=saved.rps||[];cards.pair=saved.pair||[]}catch(e){}
+if(!cards.rps.length)cards.rps=[{id:uid(),name:'이름을 입력해 줘',img:''},{id:uid(),name:'좋아하는 멤버',img:''},{id:uid(),name:'최애 조합',img:''}];
+if(!cards.pair.length)cards.pair=[{id:uid(),name:'왼쪽',img:''},{id:uid(),name:'오른쪽',img:''}];
+function uid(){return Math.random().toString(36).slice(2,10)}
+function persist(){try{localStorage.setItem(key,JSON.stringify(cards))}catch(e){alert('사진 용량이 커서 자동 저장이 어려워! 사진 크기를 줄여서 다시 넣어 줘.')} }
+function render(){board.innerHTML='';const list=cards[activeTab];if(!list.length){board.innerHTML='<div class="empty">아직 카드가 없어!<br>＋ 카드 추가를 눌러 시작해 봐 ♡</div>';return}
+list.forEach((c,i)=>{const el=document.createElement('article');el.className='card';el.innerHTML=`<div class="photo">${c.img?`<img alt="">`:'<span class="placeholder">♡</span>'}<button class="change" type="button">사진 넣기</button></div><button class="remove" type="button" aria-label="카드 삭제">×</button><input aria-label="카드 이름" maxlength="50" value=""></article>`;
+if(c.img)el.querySelector('img').src=c.img;
+const inp=el.querySelector('input');inp.value=c.name||'';inp.addEventListener('input',()=>{c.name=inp.value;persist()});
+el.querySelector('.change').onclick=()=>{targetId=c.id;fileInput.click()};
+el.querySelector('.photo').addEventListener('click',e=>{if(e.target.classList.contains('photo')||e.target.classList.contains('placeholder')){targetId=c.id;fileInput.click()}});
+el.querySelector('.remove').onclick=()=>{if(confirm('이 카드를 삭제할까?')){cards[activeTab]=cards[activeTab].filter(x=>x.id!==c.id);persist();render()}};
+board.appendChild(el)});
+}
+function setTab(tab){activeTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));render()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+$('#add').onclick=()=>{ $('#newName').value='';modal.classList.add('show');setTimeout(()=>$('#newName').focus(),100)};
+$('#cancel').onclick=()=>modal.classList.remove('show');
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});
+$('#confirm').onclick=()=>{cards[activeTab].push({id:uid(),name:$('#newName').value.trim()||'새 카드',img:''});persist();render();modal.classList.remove('show')};
+fileInput.onchange=()=>{const file=fileInput.files[0];if(!file||!targetId)return;if(file.size>7*1024*1024){alert('사진은 7MB 이하로 골라 줘!');fileInput.value='';return}const reader=new FileReader();reader.onload=()=>{const c=cards[activeTab].find(x=>x.id===targetId);if(c){c.img=reader.result;persist();render()}fileInput.value=''};reader.readAsDataURL(file)};
+$('#reset').onclick=()=>{if(confirm('현재 탭의 카드를 전부 초기화할까?')){cards[activeTab]=[];persist();render()}};
+$('#export').onclick=async()=>{try{const blob=await makeImage();const file=new File([blob],'my-rps-taste.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'MY RPS 취향표'});return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='my-rps-taste.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}catch(e){alert('이미지 저장을 완료하지 못했어. 사파리에서 다시 시도해 줘.')}};
+async function makeImage(){const list=cards[activeTab],cols=3,cellW=280,cellH=330,gap=18,pad=28,rows=Math.ceil(list.length/cols),w=pad*2+cols*cellW+(cols-1)*gap,h=150+pad*2+rows*cellH+(rows-1)*gap;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const ctx=cv.getContext('2d');ctx.fillStyle='#fff7fb';ctx.fillRect(0,0,w,h);ctx.fillStyle='#df6da4';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText('YOUR TASTE, YOUR RULES ♡',w/2,42);ctx.fillStyle='#352b34';ctx.font='bold 38px sans-serif';ctx.fillText('MY RPS 취향표',w/2,92);ctx.font='16px sans-serif';ctx.fillStyle='#8d7c88';ctx.fillText(activeTab==='rps'?'RPS 취향표':'왼른 취향표',w/2,122);
+for(let i=0;i<list.length;i++){const c=list[i],x=pad+(i%cols)*(cellW+gap),y=150+pad+Math.floor(i/cols)*(cellH+gap);ctx.fillStyle='#ffffff';roundRect(ctx,x,y,cellW,cellH,16);ctx.fill();ctx.save();ctx.beginPath();roundRect(ctx,x+1,y+1,cellW-2,cellH-56,14);ctx.clip();if(c.img){const im=await loadImage(c.img);const scale=Math.max((cellW-2)/im.width,(cellH-56)/im.height),iw=im.width*scale,ih=im.height*scale;ctx.drawImage(im,x+(cellW-iw)/2,y+(cellH-56-ih)/2,iw,ih)}else{ctx.fillStyle='#f5e3ee';ctx.fillRect(x,y,cellW,cellH-56);ctx.fillStyle='#d88fb1';ctx.font='48px sans-serif';ctx.textAlign='center';ctx.fillText('♡',x+cellW/2,y+(cellH-56)/2+16)}ctx.restore();ctx.fillStyle='#352b34';ctx.font='bold 19px sans-serif';ctx.textAlign='center';ctx.fillText(c.name||'',x+cellW/2,y+cellH-22,cellW-18)}
+return new Promise((resolve,reject)=>cv.toBlob(b=>b?resolve(b):reject(new Error('canvas')), 'image/png'))}
+function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src})}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+$('#share').onclick=async()=>{const text='내가 만든 MY RPS 취향표 ♡';try{if(navigator.share)await navigator.share({title:text,text:text,url:location.href});else if(navigator.clipboard){await navigator.clipboard.writeText(location.href);alert('사이트 주소를 복사했어!')}else alert('사이트 주소: '+location.href)}catch(e){}};
+render();
+</script>
+</body></html>
